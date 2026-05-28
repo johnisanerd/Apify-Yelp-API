@@ -234,7 +234,7 @@ Cowork is the desktop app's automation mode. To give it the Yelp API as a tool, 
 3. Restart the app. When Cowork first calls the tool, complete the OAuth prompt in your browser, or add your Apify API token in the connector settings to skip OAuth.
 4. In a Cowork chat, confirm the tool is available and ask it to run the Yelp API.
 
-Download the desktop app: https://claude.ai/download
+Download the Claude desktop app, which runs Cowork (free trial): https://claude.ai/referral/uIlpa7nPLg
 
 More help: https://docs.apify.com/platform/integrations/claude-desktop
 
@@ -259,7 +259,7 @@ claude mcp add --transport http apify \
 
 Then verify with `claude mcp list`, or run `/mcp` inside a session. Ask Claude Code to call the Yelp API.
 
-Learn more about Claude Code: https://claude.ai/code
+Get Claude Code (free trial): https://claude.ai/referral/uIlpa7nPLg
 
 Claude Code MCP docs: https://code.claude.com/docs/en/mcp
 
@@ -275,7 +275,7 @@ On claude.ai you add Apify as a connector, then enable the Yelp API tools.
 4. Alternatively, choose **Add custom connector** and paste the full MCP URL `https://mcp.apify.com/?tools=actors,docs,johnvc/yelp-search-api,johnvc/yelp-place-api,johnvc/yelp-reviews-api`, using OAuth when prompted.
 5. Ask Claude to run the Yelp API.
 
-Open Claude on the web: https://claude.ai
+Try Claude (free trial): https://claude.ai/referral/uIlpa7nPLg
 
 ## Install in Cursor
 
