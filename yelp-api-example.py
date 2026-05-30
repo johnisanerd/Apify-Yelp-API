@@ -43,7 +43,9 @@ search_items = list(client.dataset(search_run.default_dataset_id).iterate_items(
 businesses = search_items[0].get("organic_results", []) if search_items else []
 print(f"   Found {len(businesses)} businesses on page 1. Top matches:")
 for biz in businesses[:5]:
-    print(f"   - {biz.get('title')} (rating={biz.get('rating')}, reviews={biz.get('reviews')}, {biz.get('price')})")
+    cats = ", ".join(c.get("title", "") for c in (biz.get("categories") or [])[:2])
+    detail = f" [{cats}]" if cats else ""
+    print(f"   - {biz.get('title')}{detail}")
 
 # Grab the first business's ENCODED place id: the first entry of its place_ids
 # array. That id feeds the Business Details and Reviews APIs below.

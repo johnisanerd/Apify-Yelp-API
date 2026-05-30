@@ -17,7 +17,7 @@ Each returns clean, structured JSON. The Search API returns a `place_ids` array 
 ## Quick Start
 
 ### Prerequisites
-- Python 3.10 or higher
+- Python 3.11 or higher
 - An Apify account and API key ([get a free key here](https://apify.com?fpr=9n7kx3))
 
 1. **Clone the repository**
@@ -131,7 +131,7 @@ uv run python yelp-api-example.py
 | `sort_by` | `str` | no | `recommended` | `recommended`, `rating`, or `review_count`. |
 | `attrs` | `str` | no | - | Price and feature filters (e.g. `RestaurantsPriceRange2.2`). |
 | `radius_filter` | `str` | no | - | Distance radius or neighborhood value. |
-| `max_pages` | `int` | no | `1` | Pages to fetch (~10 businesses each). |
+| `max_pages` | `int` | no | `1` | Pages to fetch (~10 businesses each). Each page is billed separately. |
 
 ### Yelp Business Details API
 | Parameter | Type | Required | Default | Description |
@@ -152,20 +152,19 @@ uv run python yelp-api-example.py
 
 ## Output Format
 
-**Search** returns one item per page, each with an `organic_results` array:
+**Search** returns one item per page, each with an `organic_results` array. Search results carry the `place_ids` you chain into the Business Details and Reviews APIs; rating, review counts, and price come back from the Business Details API.
 ```json
 {
   "page_number": 1,
   "organic_results": [
     {
       "position": 1,
-      "place_ids": ["K6fkejf2ZBUdlsVrm5RbrA", "kore-coffee-new-york-2"],
-      "title": "Kore Coffee",
-      "rating": 5,
-      "reviews": 13,
-      "price": "$$",
-      "neighborhoods": "Chinatown",
-      "link": "https://www.yelp.com/biz/kore-coffee-new-york-2"
+      "place_ids": ["gcEb-XsHQEZj7lxyOHJC3g", "mandarin-coffee-roastery-new-york"],
+      "title": "Mandarin Coffee Roastery",
+      "link": "https://www.yelp.com/biz/mandarin-coffee-roastery-new-york",
+      "categories": [{ "title": "Coffee Roasteries" }, { "title": "Coffee & Tea Shops" }],
+      "open_state": "Closed until 8:00 am",
+      "thumbnail": "https://s3-media0.fl.yelpcdn.com/bphoto/.../ls.jpg"
     }
   ]
 }
@@ -205,9 +204,19 @@ uv run python yelp-api-example.py
 
 ---
 
+## Use as an MCP tool
+
+You can load the Yelp API as an MCP tool so assistants call it for you. The MCP server URL preloads all three Yelp actors:
+
+```
+https://mcp.apify.com/?tools=actors,docs,johnvc/yelp-search-api,johnvc/yelp-place-api,johnvc/yelp-reviews-api
+```
+
+Authenticate with OAuth in the browser when offered, or with your Apify API token (the same `APIFY_API_TOKEN` used by the Python example). Get a token at https://console.apify.com/settings/integrations and a free Apify account at https://apify.com?fpr=9n7kx3 .
+
 ## Install in Claude Cowork Desktop
 
-![Install in Claude Cowork Desktop](screenshots/01-claude-cowork-desktop.png)
+![Install in Claude Cowork Desktop](https://raw.githubusercontent.com/johnisanerd/ApifyPublicData/main/assets/guides/install_mcp_into_claude_desktop.png)
 
 Cowork is the desktop app's automation mode. To give it the Yelp API as a tool, add the Apify MCP server as a connector.
 
@@ -234,13 +243,12 @@ Cowork is the desktop app's automation mode. To give it the Yelp API as a tool, 
 3. Restart the app. When Cowork first calls the tool, complete the OAuth prompt in your browser, or add your Apify API token in the connector settings to skip OAuth.
 4. In a Cowork chat, confirm the tool is available and ask it to run the Yelp API.
 
-Download the Claude desktop app, which runs Cowork (free trial): https://claude.ai/referral/uIlpa7nPLg
-
+Download the desktop app and start a free trial: https://claude.ai/referral/uIlpa7nPLg
 More help: https://docs.apify.com/platform/integrations/claude-desktop
 
 ## Install in Claude Code
 
-![Install in Claude Code](screenshots/02-claude-code.png)
+![Install in Claude Code](https://raw.githubusercontent.com/johnisanerd/ApifyPublicData/main/assets/guides/install_mcp_into_claude_code.png)
 
 Claude Code is the command-line tool. Add the Yelp API's MCP server with one command:
 
@@ -259,27 +267,26 @@ claude mcp add --transport http apify \
 
 Then verify with `claude mcp list`, or run `/mcp` inside a session. Ask Claude Code to call the Yelp API.
 
-Get Claude Code (free trial): https://claude.ai/referral/uIlpa7nPLg
-
+Try Claude Code free: https://claude.ai/referral/uIlpa7nPLg
 Claude Code MCP docs: https://code.claude.com/docs/en/mcp
 
 ## Install in Claude (website)
 
-![Install in Claude (website)](screenshots/03-claude-website.png)
+![Install in Claude (website)](https://raw.githubusercontent.com/johnisanerd/ApifyPublicData/main/assets/guides/install_mcp_into_claude_ai.png)
 
 On claude.ai you add Apify as a connector, then enable the Yelp API tools.
 
 1. Go to **Settings → Connectors → Browse connectors** and search for **Apify MCP server**. Install it (enable or update if prompted).
-2. When connecting, authenticate with your Apify API token, and enable the Yelp API tools.
+2. When connecting, authenticate with your Apify API token, and enable the tools `johnvc/yelp-search-api`, `johnvc/yelp-place-api`, and `johnvc/yelp-reviews-api`.
 3. In any chat, open **+ → Connectors** and turn on **Apify**.
 4. Alternatively, choose **Add custom connector** and paste the full MCP URL `https://mcp.apify.com/?tools=actors,docs,johnvc/yelp-search-api,johnvc/yelp-place-api,johnvc/yelp-reviews-api`, using OAuth when prompted.
 5. Ask Claude to run the Yelp API.
 
-Try Claude (free trial): https://claude.ai/referral/uIlpa7nPLg
+Open Claude on the web: https://claude.ai
 
 ## Install in Cursor
 
-![Install in Cursor](screenshots/04-cursor.png)
+![Install in Cursor](https://raw.githubusercontent.com/johnisanerd/ApifyPublicData/main/assets/guides/install_mcp_into_cursor.png)
 
 Cursor reads MCP servers from a project file at `.cursor/mcp.json`.
 
@@ -312,6 +319,22 @@ Cursor reads MCP servers from a project file at `.cursor/mcp.json`.
 4. In Composer or Chat, ask Cursor to call the Yelp API.
 
 New to Cursor? Get it here: https://cursor.com/referral?code=XQP4VBLI3NNX
+
+## Install in ChatGPT
+
+![Install in ChatGPT](https://raw.githubusercontent.com/johnisanerd/ApifyPublicData/main/assets/guides/install_mcp_into_ChatGPT.png)
+
+ChatGPT connects to the Apify MCP server through Developer mode (available on ChatGPT Pro, Plus, Business, Enterprise, and Education plans).
+
+1. Click your profile icon, then go to **Settings > Apps**. If you do not see a **Create app** button, open **Advanced settings** and enable **Developer mode**.
+2. Click **Create app** and fill out the form:
+   - **Name:** Apify
+   - **MCP Server URL:** `https://mcp.apify.com/?tools=actors,docs,johnvc/yelp-search-api,johnvc/yelp-place-api,johnvc/yelp-reviews-api`
+   - **Authentication:** OAuth
+3. Click **Create** and authorize the connection with Apify.
+4. To use the app in a conversation, click **+** in the chat, choose **Developer mode**, and select **Apify**.
+
+More help: https://docs.apify.com/platform/integrations/mcp
 
 ---
 
