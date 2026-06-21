@@ -342,4 +342,4 @@ More help: https://docs.apify.com/platform/integrations/mcp
 
 *Use the Yelp API to power your data workflows with reliable, structured results.*
 
-Last Updated: 2026.06.19
+Last Updated: 2026.06.21
