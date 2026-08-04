@@ -8,7 +8,7 @@ This is a quick-start for a three-part Yelp API suite. The actors are designed t
 **Yelp Business Details API:** [apify.com/johnvc/yelp-place-api](https://apify.com/johnvc/yelp-place-api?fpr=9n7kx3) - full business profiles (hours, amenities, menus).
 **Yelp Reviews API:** [apify.com/johnvc/yelp-reviews-api](https://apify.com/johnvc/yelp-reviews-api?fpr=9n7kx3) - ratings and review text for a business.
 
-Each returns clean, structured JSON. The Search API returns a `place_ids` array on every business; feed the first (encoded) id into the Business Details and Reviews APIs to enrich any result. No browser automation, no captchas, predictable pay-per-use pricing.
+Each returns clean, structured JSON. The Search API returns a `place_ids` array on every business; feed the first (encoded) id into the Business Details and Reviews APIs to enrich any result. You can also skip the search entirely and paste a Yelp URL straight into any of the three. No browser automation, no captchas, predictable pay-per-use pricing.
 
 ## Video Walkthrough
 
@@ -102,6 +102,15 @@ uv run python yelp-api-example.py
 }
 ```
 
+### Search (from a search URL you pasted)
+Run the search on yelp.com, copy the address bar, and paste it in. The term, location, category, sort order and filters are read out of the URL, and anything in the URL wins over the individual fields.
+```json
+{
+  "search_url": "https://www.yelp.com/search?find_desc=coffee&find_loc=New+York%2C+NY&sortby=rating",
+  "max_pages": 1
+}
+```
+
 ### Business Details (by place_id from a search result)
 ```json
 {
@@ -110,7 +119,20 @@ uv run python yelp-api-example.py
 }
 ```
 
+### Business Details (from pasted business URLs)
+Entries can be URLs, encoded ids, or aliases, mixed in one list. URLs are converted locally, so there is no extra call and no extra cost.
+```json
+{
+  "place_ids": [
+    "https://www.yelp.com/biz/maman-new-york-22",
+    "juniors-restaurant-new-york-9",
+    "ED7A7vDdg8yLNKJTSVHHmg"
+  ]
+}
+```
+
 ### Reviews (by encoded place_id)
+The cheapest way in: an encoded id needs no lookup step.
 ```json
 {
   "place_id": "ED7A7vDdg8yLNKJTSVHHmg",
@@ -120,12 +142,23 @@ uv run python yelp-api-example.py
 }
 ```
 
+### Reviews (from a pasted business URL)
+No search step needed. The URL is resolved to the encoded id for you, which adds one `place_resolved` event to the run.
+```json
+{
+  "place_id": "https://www.yelp.com/biz/maman-new-york-22",
+  "sort_by": "date_desc",
+  "max_pages": 1
+}
+```
+
 ## Input Parameters
 
 ### Yelp Search API
 | Parameter | Type | Required | Default | Description |
 |-----------|------|----------|---------|-------------|
-| `location` | `str` | YES | - | City and state, address, or ZIP (e.g. `New York, NY`). |
+| `search_url` | `str` | no | - | A full Yelp search results URL pasted from your browser. The term, location, category, sort order and filters are read out of it, and URL values win over the fields below. Supply this or `location`. The `start` offset in the URL is ignored - use `max_pages`. |
+| `location` | `str` | YES* | - | City and state, address, or ZIP (e.g. `New York, NY`). *Required unless `search_url` is given. |
 | `search_term` | `str` | no | - | What to search for (e.g. `coffee`). Blank browses all in the location. |
 | `category_filter` | `str` | no | - | Yelp category alias (e.g. `restaurants`). |
 | `sort_by` | `str` | no | `recommended` | `recommended`, `rating`, or `review_count`. |
@@ -136,7 +169,7 @@ uv run python yelp-api-example.py
 ### Yelp Business Details API
 | Parameter | Type | Required | Default | Description |
 |-----------|------|----------|---------|-------------|
-| `place_ids` | `list[str]` | YES | - | One or more Yelp place ids or aliases (from a search result). |
+| `place_ids` | `list[str]` | YES | - | One or more businesses, mixed freely: a pasted Yelp business URL, an encoded place id, or an alias (from a search result). URLs are converted locally, so there is no extra call or cost. An unreadable entry becomes its own `ValidationError` item and is not billed. |
 | `full_menu` | `bool` | no | `false` | Return the structured full menu instead of the profile. |
 | `menu_name` | `str` | no | - | Which menu to fetch when a business has more than one. |
 | `business_alert` | `bool` | no | `false` | Include the business alert message when present. |
@@ -144,7 +177,7 @@ uv run python yelp-api-example.py
 ### Yelp Reviews API
 | Parameter | Type | Required | Default | Description |
 |-----------|------|----------|---------|-------------|
-| `place_id` | `str` | YES | - | The encoded place id (first entry of a search result's `place_ids`). |
+| `place_id` | `str` | YES | - | The business: a pasted Yelp business URL, the encoded place id (first entry of a search result's `place_ids`), or an alias. A URL or alias is resolved for you, adding one `place_resolved` event; an encoded id skips that fee. |
 | `sort_by` | `str` | no | relevance | `relevance_desc`, `date_desc`, `date_asc`, `rating_desc`, `rating_asc`, `elites_desc`. |
 | `rating` | `str` | no | - | Filter by stars, e.g. `5` or `4,5`. |
 | `q` | `str` | no | - | Keep only reviews mentioning this keyword. |
@@ -342,4 +375,4 @@ More help: https://docs.apify.com/platform/integrations/mcp
 
 *Use the Yelp API to power your data workflows with reliable, structured results.*
 
-Last Updated: 2026.08.03
+Last Updated: 2026.08.04
