@@ -83,3 +83,38 @@ if first_place_id:
         reviewer = (rev.get("user") or {}).get("name")
         text = (rev.get("comment") or {}).get("text", "") or ""
         print(f"   - {rev.get('rating')} stars by {reviewer}: {text[:80]}")
+
+# ---------------------------------------------------------------------------
+# SHORTCUT: skip the search when you already know the business.
+#
+# All three Actors accept a Yelp URL pasted straight from the browser, so you
+# can go directly to reviews without a search step. The chain above stays the
+# cheapest route (an encoded place_id needs no lookup, while a URL or alias
+# costs one extra `place_resolved` event), which is why this is commented out.
+#
+# reviews_run = client.actor("johnvc/yelp-reviews-api").call(
+#     run_input={
+#         "place_id": "https://www.yelp.com/biz/maman-new-york-22",
+#         "sort_by": "date_desc",
+#         "max_pages": 1,
+#     }
+# )
+#
+# The Business Details Actor takes URLs, ids and aliases mixed in one list:
+#
+# place_run = client.actor("johnvc/yelp-place-api").call(
+#     run_input={"place_ids": [
+#         "https://www.yelp.com/biz/maman-new-york-22",
+#         "juniors-restaurant-new-york-9",
+#     ]}
+# )
+#
+# And the Search Actor takes a pasted search URL instead of term + location:
+#
+# search_run = client.actor("johnvc/yelp-search-api").call(
+#     run_input={
+#         "search_url": "https://www.yelp.com/search?find_desc=coffee&find_loc=New+York%2C+NY",
+#         "max_pages": 1,
+#     }
+# )
+# ---------------------------------------------------------------------------
